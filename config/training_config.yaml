@@ -5,7 +5,7 @@
 model:
   teacher_model_name: "Qwen/Qwen2.5-32B-Instruct"
   student_model_name: "Qwen/Qwen2.5-7B-Instruct"
-  cache_size: 500  # 💡 Disabled: 0% hit rate ineffective, code sets use_cache=False
+  cache_size: 0 
   cache_policy: "LRU"
   use_lora: true
 
