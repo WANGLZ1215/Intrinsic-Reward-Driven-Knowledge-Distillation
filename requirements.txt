@@ -1,0 +1,29 @@
+# Core dependencies - fixed compatible versions
+torch==2.3.1
+torchvision==0.18.1  # Compatible with torch 2.3.1
+torchaudio==2.3.1    # Compatible with torch 2.3.1
+transformers>=4.43.3,<5.0.0  # Upgraded to latest stable version, fixes CUDA compatibility issues
+datasets==2.20.0
+accelerate==0.33.0
+peft==0.11.1
+trl==0.9.4
+
+# Data processing
+numpy==1.26.4
+pandas==2.2.2
+scikit-learn==1.5.1
+
+# Visualization and monitoring
+tensorboard==2.17.0
+wandb==0.17.5
+
+# Mathematical and scientific computing (actually used in project)
+sympy==1.12
+regex==2024.7.24
+
+# Utility libraries
+tqdm==4.66.4
+pyyaml==6.0.2
+jsonlines==3.1.0
+
+

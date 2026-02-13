@@ -1,0 +1,131 @@
+# Training Configuration File
+# Compatible with VAST AI GPU environment - H200 140GB version
+
+# Model Configuration - 280GB memory optimization (fully utilizing 2×140GB H200)
+model:
+  teacher_model_name: "Qwen/Qwen2.5-32B-Instruct"
+  student_model_name: "Qwen/Qwen2.5-7B-Instruct"
+  cache_size: 500  # 💡 Disabled: 0% hit rate ineffective, code sets use_cache=False
+  cache_policy: "LRU"
+  use_lora: true
+
+# LoRA Configuration
+lora:
+  r: 8                     # Reduce rank to decrease parameter count
+  lora_alpha: 16           # Maintain alpha/r=2 ratio
+  target_modules: ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+  lora_dropout: 0.1        # Keep dropout to prevent overfitting
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+# Supervised Fine-Tuning Configuration
+sft:
+  output_dir: "./checkpoints/sft_model"
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 4
+  num_train_epochs: 3
+  learning_rate: 2e-5
+  save_strategy: "epoch"
+  eval_strategy: "epoch"  # Use new parameter name to avoid deprecation warning
+  logging_steps: 100
+  save_total_limit: 3
+  load_best_model_at_end: true
+  metric_for_best_model: "eval_loss"
+  greater_is_better: false
+  max_length: 512
+  warmup_steps: 100
+
+# PPO Configuration - 280GB memory optimization (fully utilizing H200 140GB for enhanced training)
+ppo:
+  output_dir: "./checkpoints/rl_model"
+  learning_rate: 3e-5
+  batch_size: 4         # Increase batch size to stabilize KL divergence
+  mini_batch_size: 2
+  ppo_epochs: 2
+  cliprange: 0.2
+  vf_coef: 0.2
+  entropy_coef: 0.01
+  init_kl_coef: 0.05
+  gamma: 0.99
+  lam: 0.95
+  max_grad_norm: 1.0
+  max_length: 768  
+  gradient_checkpointing: true  # ✅ Recommended: H200 has sufficient memory but can further optimize usage
+
+# Reward Configuration
+reward:
+  lambda_intrinsic: 1.0  # Intrinsic reward weight (ablation study: use only intrinsic reward)
+  lambda_correctness: 0.0  # Answer correctness weight (ablation study: disable correctness reward)
+  temperature: 0.8  # Intrinsic reward temperature parameter α for soft value function
+  normalization: "mean_std"  # Normalization method
+  reward_scale: 0.02      # Reward scaling coefficient (controls trajectory reward magnitude)
+  clip_min: -2.0  # Reward clipping minimum value
+  clip_max: 2.0  # Reward clipping maximum value
+  update_rate: 0.01  # Intrinsic reward statistics update rate (exponential moving average coefficient)
+  # Adaptive weight configuration
+  use_adaptive_weights: false  # Enable adaptive weights
+  adaptation_rate: 0.01  # Weight adaptation rate
+  reasoning_weight: 0.0  # Reasoning process weight
+  format_weight: 0.0  # Format constraint weight
+
+# Data Configuration
+data:
+  dataset_name: "gsm8k"
+  dataset_config: "main"
+  max_train_samples: null  # null means use all data
+  max_eval_samples: null 
+  train_split: "train"
+  eval_split: "test"
+
+# Training Configuration - 2×H200 140GB optimization
+training:
+  max_steps: 1000
+  save_steps: 50  # 🚀 H200 has sufficient memory, can save more frequently
+  eval_steps: 100  # 🚀 H200 has sufficient memory, can evaluate more frequently
+  logging_steps: 10
+  gradient_accumulation_steps: 16  # Reduce accumulation steps to ensure more frequent updates
+  fp16: false  # Disable FP16 to avoid gradient instability
+  bf16: true   # Use BF16 instead of FP16 for better stability
+  dataloader_num_workers: 4  # 🚀 H200 has strong performance, can fully utilize multi-threading
+  remove_unused_columns: false
+
+# Generation Configuration
+generation:
+  do_sample: true
+  temperature: 0.7
+  top_k: 0
+  top_p: 1.0
+  max_new_tokens: 480
+
+# Evaluation Configuration
+evaluation:
+  eval_batch_size: 8
+  max_eval_samples: null  # null means use all test set data
+  metrics: ["accuracy", "step_coverage", "logical_consistency", "kl_divergence"]
+  save_predictions: true
+
+# Device Configuration
+device:
+  use_cuda: true
+  device_map: null  # Use manual control (load then .to(device)) to avoid HF auto CPU residue
+  torch_dtype: "bfloat16"  # Use bfloat16 instead of float16
+  use_mixed_precision: false  # Disable mixed precision to avoid FP16 issues
+
+# Parallel Processing Configuration
+parallel:
+  enabled: false  # Whether to enable parallel processing (disabled, use single thread to avoid tokenizer thread safety issues)
+  num_workers: 1  # Number of parallel worker processes/threads
+  use_threads: true  # Whether to use thread pool (True) or process pool (False)
+  inference_batch_size: 16  # Parallel inference batch size
+  cache_queue_size: 1000  # Asynchronous cache queue size
+  use_parallel_data_loader: false  # Whether to use parallel data loader (disabled)
+  data_loader_workers: 1  # Number of data loader worker processes
+
+# Logging Configuration
+logging:
+  log_level: "INFO"
+  use_wandb: true
+  wandb_project: "intrinsic-reward-distillation"
+  use_tensorboard: true
+  tensorboard_log_dir: "./logs"
+
