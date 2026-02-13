@@ -190,10 +190,4 @@ If you use this code in your research, please cite the relevant papers on:
 - **Project Structure**: See [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) for detailed module descriptions
 - **SFT Evaluation Guide**: See [evaluation/SFT_EVALUATION_GUIDE.md](evaluation/SFT_EVALUATION_GUIDE.md) for SFT model evaluation instructions
 
-## License
 
-[Specify your license here]
-
-## Contact
-
-[Specify contact information here]
