@@ -35,7 +35,7 @@ sft:
   max_length: 512
   warmup_steps: 100
 
-# PPO Configuration - 280GB memory optimization (fully utilizing H200 140GB for enhanced training)
+# PPO Configuration 
 ppo:
   output_dir: "./checkpoints/rl_model"
   learning_rate: 3e-5
@@ -50,7 +50,7 @@ ppo:
   lam: 0.95
   max_grad_norm: 1.0
   max_length: 768  
-  gradient_checkpointing: true  # ✅ Recommended: H200 has sufficient memory but can further optimize usage
+  gradient_checkpointing: true  
 
 # Reward Configuration
 reward:
@@ -77,16 +77,16 @@ data:
   train_split: "train"
   eval_split: "test"
 
-# Training Configuration - 2×H200 140GB optimization
+# Training Configuration
 training:
   max_steps: 1000
-  save_steps: 50  # 🚀 H200 has sufficient memory, can save more frequently
-  eval_steps: 100  # 🚀 H200 has sufficient memory, can evaluate more frequently
+  save_steps: 50  
+  eval_steps: 100  
   logging_steps: 10
   gradient_accumulation_steps: 16  # Reduce accumulation steps to ensure more frequent updates
   fp16: false  # Disable FP16 to avoid gradient instability
   bf16: true   # Use BF16 instead of FP16 for better stability
-  dataloader_num_workers: 4  # 🚀 H200 has strong performance, can fully utilize multi-threading
+  dataloader_num_workers: 4 
   remove_unused_columns: false
 
 # Generation Configuration
